@@ -18,8 +18,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* DB connection*/
-const mongoURI = process.env.MONGODB_URI;
-//"mongodb+srv://enkar6996:Towen6996@cluster0.8o0uw24.mongodb.net/coder-management" 
+// const mongoURI = process.env.MONGODB_URI;
+const mongoURI = "mongodb+srv://enkar6996:Towen6996@cluster0.8o0uw24.mongodb.net/coder-management";
 
 mongoose
   .connect(mongoURI)
