@@ -5,13 +5,13 @@ const {validateSchema} = require("../helpers/validateSchema")
 const Joi = require("joi")
 
 const getTaskByIdSchema = Joi.object({
-    id: Joi.number().required(),
+    id: Joi.string().required(),
 });
 
 const createTaskSchema = Joi.object({
     name: Joi.string().required(),
     status: Joi.string().required(),
-    assignedTo: Joi.number().optional(),
+    assignedTo: Joi.string().optional(),
 });
 
 router.get("/",taskController.getAllTasks)

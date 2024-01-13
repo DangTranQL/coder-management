@@ -6,7 +6,7 @@ const Joi = require('joi');
 router.get("/",userController.getAllUsers)
 
 const getUserByIdSchema = Joi.object({
-    id: Joi.number().required(),
+    id: Joi.string().required(),
 });
 
 const createUserSchema = Joi.object({
