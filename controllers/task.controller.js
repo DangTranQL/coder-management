@@ -5,24 +5,24 @@ const User = require('../models/user');
 
 taskController.createTask = async (req, res, next) => {
     try {
-        if (!req.body) {
-            const exception = new Error("Request body is missing");
-            throw exception;
-        }
+        // if (!req.body) {
+        //     const exception = new Error("Request body is missing");
+        //     throw exception;
+        // }
 
         const {name, status, assignedTo} = req.body;
 
         // Check if name exists and is a valid string
-        if (!name || typeof name !== 'string') {
-            const exception = new Error("Invalid or missing name");
-            throw exception;
-        }
+        // if (!name || typeof name !== 'string') {
+        //     const exception = new Error("Invalid or missing name");
+        //     throw exception;
+        // }
 
         // Check if status exists and is a valid string
-        if (!status || typeof status !== 'string') {
-            const exception = new Error("Invalid or missing status");
-            throw exception;
-        }
+        // if (!status || typeof status !== 'string') {
+        //     const exception = new Error("Invalid or missing status");
+        //     throw exception;
+        // }
         let newTask = await Task.create({name, status, assignedTo});
         if (assignedTo) {
             await User.findByIdAndUpdate(assignedTo, {$push: {tasks: newTask._id}});

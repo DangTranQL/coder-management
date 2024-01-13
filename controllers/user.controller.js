@@ -1,28 +1,44 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const Task = require('../models/task');
+const joi = require('joi');
 const userController = {};
+
+validateCreate = joi.object({
+    name: joi.string().required(),
+    role: joi.string().required(),
+    tasks: joi.array().items(joi.string())
+})
 
 userController.createUser = async (req, res, next) => {
     try {
-        if (!req.body) {
-            const exception = new Error("Request body is missing");
-            throw exception;
-        }
+        // if (!req.body) {
+        //     const exception = new Error("Request body is missing");
+        //     throw exception;
+        // }
+
+        // const {name, role, tasks} = req.body;
+
+        // // Check if name exists and is a valid string
+        // if (!name || typeof name !== 'string') {
+        //     const exception = new Error("Invalid or missing name");
+        //     throw exception;
+        // }
+
+        // // Check if role exists
+        // if (!role) {
+        //     const exception = new Error("Missing required information");
+        //     throw exception;
+        // }
+
+        // const {error} = validateCreate.validate(req.body);
+        // if(error) {
+        //     const exception = new Error(error.message);
+        //     throw exception;
+        // }
 
         const {name, role, tasks} = req.body;
 
-        // Check if name exists and is a valid string
-        if (!name || typeof name !== 'string') {
-            const exception = new Error("Invalid or missing name");
-            throw exception;
-        }
-
-        // Check if role exists
-        if (!role) {
-            const exception = new Error("Missing required information");
-            throw exception;
-        }
         let newUser = await User.create({name, role, tasks});
         const response = {message: "Create User Successfully!", user: newUser}
         res.status(200).send({data: response})
@@ -63,10 +79,10 @@ userController.getAllUsers = async (req, res, next) => {
 userController.getUserById = async (req, res, next) => {    
     try{
         const {id} = req.params;
-        if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
-        }
+        // if (mongoose.Types.ObjectId.isValid(id) === false) {
+        //     const exception = new Error('Invalid id');
+        //     throw exception;
+        // }
         const user = await User.findById(id, {isDeleted: false});
         if(!user) {
             const exception = new Error('User not found');
@@ -120,10 +136,10 @@ userController.deleteUser = async (req, res, next) => {
 userController.removeTask = async (req, res, next) => {
     try{
         const {id} = req.params;
-        if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
-        }
+        // if (mongoose.Types.ObjectId.isValid(id) === false) {
+        //     const exception = new Error('Invalid id');
+        //     throw exception;
+        // }
         let user = await User.findById(id, {isDeleted: false});
         const {tasks} = req.body;
         if (user.tasks.includes(tasks)) {
@@ -141,10 +157,10 @@ userController.removeTask = async (req, res, next) => {
 userController.getTasksbyId = async (req, res, next) => {
     try{
         const {id} = req.params;
-        if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
-        }
+        // if (mongoose.Types.ObjectId.isValid(id) === false) {
+        //     const exception = new Error('Invalid id');
+        //     throw exception;
+        // }
         const user = await User.findById(id, {isDeleted: false});
         if(!user) {
             const exception = new Error('User not found');

@@ -1,19 +1,38 @@
 const express= require("express")
 const router = express.Router()
 const userController = require("../controllers/user.controller")
-
+const {validateSchema} = require('../helpers/validateSchema');
+const Joi = require('joi');
 router.get("/",userController.getAllUsers)
 
-router.get("/:id",userController.getUserById)
+const getUserByIdSchema = Joi.object({
+    id: Joi.number().required(),
+});
 
-router.get("/search/:name",userController.getUserByName)
+const createUserSchema = Joi.object({
+    name: Joi.string().required(),
+    role: Joi.string().required(),
+    tasks: Joi.array().items(Joi.string())
+});
 
-router.get("/tasks/:id",userController.getTasksbyId)
+const getUserByNameSchema = Joi.object({
+    name: Joi.string().required(),
+});
 
-router.post("/",userController.createUser)
+const taskSchema = Joi.object({
+    task: Joi.string().required(),
+});
 
-router.delete("/:id",userController.deleteUser)
+router.get("/:id", validateSchema(getUserByIdSchema, "params"), userController.getUserById)
 
-router.delete("/remove/:id",userController.removeTask)
+router.get("/search/:name", validateSchema(getUserByNameSchema, "params"), userController.getUserByName)
+
+router.get("/tasks/:id", validateSchema(getUserByIdSchema, "params"), userController.getTasksbyId)
+
+router.post("/", validateSchema(createUserSchema, "body"), userController.createUser)
+
+router.delete("/:id", validateSchema(getUserByIdSchema, "params"), userController.deleteUser)
+
+router.delete("/remove/:id", validateSchema(getUserByIdSchema, "params"), validateSchema(taskSchema, "body"), userController.removeTask)
 
 module.exports = router
