@@ -2,26 +2,27 @@ const mongoose = require('mongoose');
 const Task = require('../models/task');
 const taskController = {};
 const User = require('../models/user');
+const {AppError} = require('../helpers/utils');
 
 taskController.createTask = async (req, res, next) => {
     try {
         // if (!req.body) {
-        //     const exception = new Error("Request body is missing");
-        //     throw exception;
+        //     const error = new Error("Request body is missing");
+        //     next(error);
         // }
 
         const {name, status, assignedTo} = req.body;
 
         // Check if name exists and is a valid string
         // if (!name || typeof name !== 'string') {
-        //     const exception = new Error("Invalid or missing name");
-        //     throw exception;
+        //     const error = new Error("Invalid or missing name");
+        //     next(error);
         // }
 
         // Check if status exists and is a valid string
         // if (!status || typeof status !== 'string') {
-        //     const exception = new Error("Invalid or missing status");
-        //     throw exception;
+        //     const error = new Error("Invalid or missing status");
+        //     next(error);
         // }
         let newTask = await Task.create({name, status, assignedTo});
         if (assignedTo) {
@@ -38,13 +39,13 @@ taskController.deleteTask = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID Type', 'Bad Request');
+            next(error);
         }
         const task = await Task.findById(id, {isDeleted: false});
         if(!task) {
-            const exception = new Error('Task not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         if (task.assignedTo){
             await User.findByIdAndUpdate(task.assignedTo, {$pull: {tasks: id}});
@@ -62,8 +63,8 @@ taskController.getAllTasks = async (req, res, next) => {
         let {page,...filterQuery} = req.query;
         const filterKeys = Object.keys(filterQuery);
         if(filterKeys.length) {
-            const exception = new Error('This is for all tasks');
-            throw exception;
+            const error = new AppError(404, 'This is for all task', 'Bad Request');
+            next(error);
         }
 
         let allTasks = await Task.find({"isDeleted": false});
@@ -90,13 +91,13 @@ taskController.getTaskById = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID Type', 'Bad Request');
+            next(error);
         }
         const task = await Task.findById(id, {isDeleted: false});
         if(!task) {
-            const exception = new Error('Task not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         const response = {message: "Get Task Successfully!", task: task};
         res.status(200).send({data: response});
@@ -109,8 +110,8 @@ taskController.assignTask = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID Type', 'Bad Request');
+            next(error);
         }
         const task = await Task.findById(id, {isDeleted: false});
         const {assignedTo} = req.body;
@@ -130,19 +131,19 @@ taskController.updateTask = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID Type', 'Bad Request');
+            next(error);
         }
         const task = Task.findById(id, {isDeleted: false});
         const {name, status} = req.body;
         // if (!name && !status) {
-        //     const exception = new Error("Missing required information");
-        //     throw exception;
+        //     const error = new Error("Missing required information");
+        //     next(error);
         // }
         if (task.status === "done") {
             if (status !== "archive" || status !== "done") {
-                const exception = new Error("Cannot change status of done task except to archive");
-                throw exception;
+                const error = new AppError(401, 'Cannot change status', 'Bad Request');;
+                next(error);
             }
         }
         let updatedTask = await Task.findByIdAndUpdate(id, {name, status});

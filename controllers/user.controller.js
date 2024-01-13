@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {AppError} = require('../helpers/utils');
 const User = require('../models/user');
 const Task = require('../models/task');
 const userController = {};
@@ -45,8 +46,8 @@ userController.getAllUsers = async (req, res, next) => {
         let {page,...filterQuery} = req.query;
         const filterKeys = Object.keys(filterQuery);
         if(filterKeys.length) {
-            const exception = new Error('This is for all users');
-            throw exception;
+            const error = new AppError(400, 'This is for all user', 'Bad Request');
+            next(error);
         }
 
         let allUsers = await User.find({"isDeleted": false});
@@ -73,13 +74,13 @@ userController.getUserById = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID type', 'Bad Request');
+            next(error);
         }
         const user = await User.findById(id, {isDeleted: false});
         if(!user) {
-            const exception = new Error('User not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         const response = {message: "Get User Successfully!", user: user};
         res.status(200).send({data: response});
@@ -93,8 +94,8 @@ userController.getUserByName = async (req, res, next) => {
         const {name} = req.params;
         const user = await User.find({name: name}, {isDeleted: false});
         if(!user) {
-            const exception = new Error('User not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         const response = {message: "Get User Successfully!", user: user};
         res.status(200).send({data: response});
@@ -107,13 +108,13 @@ userController.deleteUser = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID type', 'Bad Request');
+            next(error);
         }
         const user = await User.findById(id, {isDeleted: false});
         if(!user) {
-            const exception = new Error('User not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         if (user.tasks.length > 0) {
             await Task.updateMany({_id: {$in: user.tasks}}, {assignedTo: null}, {new: true});
@@ -130,8 +131,8 @@ userController.removeTask = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID type', 'Bad Request');
+            next(error);
         }
         let user = await User.findById(id, {isDeleted: false});
         const {tasks} = req.body;
@@ -151,13 +152,13 @@ userController.getTasksbyId = async (req, res, next) => {
     try{
         const {id} = req.params;
         if (mongoose.Types.ObjectId.isValid(id) === false) {
-            const exception = new Error('Invalid id');
-            throw exception;
+            const error = new AppError(400, 'Wrong ID type', 'Bad Request');
+            next(error);
         }
         const user = await User.findById(id, {isDeleted: false});
         if(!user) {
-            const exception = new Error('User not found');
-            throw exception;
+            const error = new AppError(404, 'Not Found', 'Bad Request');
+            next(error);
         }
         const response = {message: "Get Tasks Successfully!", tasks: user.tasks};
         res.status(200).send({data: response});
