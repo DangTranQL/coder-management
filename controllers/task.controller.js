@@ -135,10 +135,10 @@ taskController.updateTask = async (req, res, next) => {
         }
         const task = Task.findById(id, {isDeleted: false});
         const {name, status} = req.body;
-        if (!name && !status) {
-            const exception = new Error("Missing required information");
-            throw exception;
-        }
+        // if (!name && !status) {
+        //     const exception = new Error("Missing required information");
+        //     throw exception;
+        // }
         if (task.status === "done") {
             if (status !== "archive" || status !== "done") {
                 const exception = new Error("Cannot change status of done task except to archive");
